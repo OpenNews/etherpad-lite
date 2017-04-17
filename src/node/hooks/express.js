@@ -1,5 +1,6 @@
 var hooks = require("ep_etherpad-lite/static/js/pluginfw/hooks");
 var express = require('express');
+var sslRedirect = require('heroku-ssl-redirect');
 var settings = require('../utils/Settings');
 var fs = require('fs');
 var path = require('path');
@@ -63,18 +64,8 @@ exports.restartServer = function () {
     server = http.createServer(app);
   }
 
-  app.use(function (req, res, next) {
-    // res.header("X-Frame-Options", "deny"); // breaks embedded pads
-    if(settings.ssl){ // if we use SSL
-      res.header("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-    }
-
-    // Stop IE going into compatability mode
-    // https://github.com/ether/etherpad-lite/issues/2547
-    res.header("X-UA-Compatible", "IE=Edge,chrome=1");
-    res.header("Server", serverName);
-    next();
-  });
+  // modified to use sslRedirect for Heroku deployment
+  app.use(sslRedirect());
 
   if(settings.trustProxy){
     app.enable('trust proxy');
