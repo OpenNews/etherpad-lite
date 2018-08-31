@@ -1,5 +1,10 @@
 #!/bin/bash
 #
+# WARNING: since Etherpad 1.7.0 (2018-08-17), this script is DEPRECATED, and
+#          will be removed/modified in a future version.
+#          It's left here just for documentation.
+#          The branching policies for releases have been changed.
+#
 # This script is used to publish a new release/version of etherpad on github
 #
 # Work that is done by this script:
@@ -15,6 +20,16 @@
 # - Push this branch and merge it to master
 # ETHER_REPO:
 # - Create a new release on github
+
+printf "WARNING: since Etherpad 1.7.0 this script is DEPRECATED, and will be removed/modified in a future version.\n\n"
+while true; do
+    read -p "Do you want to continue? This is discouraged. [y/N]" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) printf "Please answer yes or no.\n\n";;
+    esac
+done
 
 ETHER_REPO="https://github.com/ether/etherpad-lite.git"
 ETHER_WEB_REPO="https://github.com/ether/ether.github.com.git"
@@ -65,9 +80,21 @@ function check_api_token {
 
 function modify_files {
   # Add changelog text to first line of CHANGELOG.md
-  sed -i "1s/^/${changelogText}\n/" CHANGELOG.md
+
+  msg=""
+  # source: https://unix.stackexchange.com/questions/9784/how-can-i-read-line-by-line-from-a-variable-in-bash#9789
+  while IFS= read -r line
+  do
+    # replace newlines with literal "\n" for using with sed
+    msg+="$line\n"
+  done < <(printf '%s\n' "${changelogText}")
+
+  sed -i "1s/^/${msg}\n/" CHANGELOG.md
+  [[ $? != 0 ]] && echo "Aborting: Error modifying CHANGELOG.md" && exit 1
+
   # Replace version number of etherpad in package.json
   sed -i -r "s/(\"version\"[ ]*: \").*(\")/\1$VERSION\2/" src/package.json
+  [[ $? != 0 ]] && echo "Aborting: Error modifying package.json" && exit 1
 }
 
 function create_release_branch {

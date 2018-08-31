@@ -4,11 +4,12 @@
 			"Dbc334",
 			"Mateju",
 			"Skalcaa",
-			"HairyFotr"
+			"HairyFotr",
+			"Upwinxp"
 		]
 	},
 	"index.newPad": "Nov dokument",
-	"index.createOpenPad": "ali pa odpri dokument z imenom:",
+	"index.createOpenPad": "ali pa ustvari/odpri dokument z imenom:",
 	"pad.toolbar.bold.title": "Krepko (Ctrl-B)",
 	"pad.toolbar.italic.title": "Ležeče (Ctrl-I)",
 	"pad.toolbar.underline.title": "Podčrtano (Ctrl-U)",
@@ -20,7 +21,7 @@
 	"pad.toolbar.undo.title": "Razveljavi (Ctrl-Z)",
 	"pad.toolbar.redo.title": "Ponovno uveljavi (Ctrl-Y)",
 	"pad.toolbar.clearAuthorship.title": "Počisti barve avtorstva (Ctrl+Shift+C)",
-	"pad.toolbar.import_export.title": "Izvozi/Uvozi različne oblike zapisov",
+	"pad.toolbar.import_export.title": "Uvozi/Izvozi različne oblike zapisov",
 	"pad.toolbar.timeslider.title": "Časovni trak",
 	"pad.toolbar.savedRevision.title": "Shrani redakcijo",
 	"pad.toolbar.settings.title": "Nastavitve",
@@ -68,7 +69,7 @@
 	"pad.modals.unauth.explanation": "Med pregledovanjem te strani so se dovoljenja za ogled spremenila. Poskusite se ponovno povezati.",
 	"pad.modals.looping.explanation": "Zaznane so težave pri komunikaciji s strežnikom za usklajevanje.",
 	"pad.modals.looping.cause": "Morda ste se povezali preko neustrezno nastavljenega požarnega zidu ali posredniškega strežnika.",
-	"pad.modals.initsocketfail": "Strežnika je nedosegljiv.",
+	"pad.modals.initsocketfail": "Strežnik je nedosegljiv.",
 	"pad.modals.initsocketfail.explanation": "Povezava s strežnikom za usklajevanje ni mogoča.",
 	"pad.modals.initsocketfail.cause": "Najverjetneje gre za težavo z vašim brskalnikom, ali internetno povezavo.",
 	"pad.modals.slowcommit.explanation": "Strežnik se ne odziva.",

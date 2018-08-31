@@ -39,5 +39,15 @@ for ( var i = 0; i < argv.length; i++ ) {
     exports.argv.credentials = arg;
   }
 
+  // Override location of settings.json file
+  if ( prevArg == '--sessionkey' ) {
+    exports.argv.sessionkey = arg;
+  }
+
+  // Override location of settings.json file
+  if ( prevArg == '--apikey' ) {
+    exports.argv.apikey = arg;
+  }
+
   prevArg = arg;
 }

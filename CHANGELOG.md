@@ -1,3 +1,47 @@
+# 1.7.0
+* FIX: `getLineHTMLForExport()` no longer produces multiple copies of a line. **WARNING**: this could potentially break some plugins
+* FIX: authorship of bullet points no longer changes when a second author edits them
+* FIX: improved Firefox compatibility (non printable keys)
+* FIX: `getPadPlainText()` was not working
+* REQUIREMENTS: minimum required Node version is 6.9.0 LTS. The next release will require at least Node 8.9.0 LTS
+* SECURITY: updated MySQL, Elasticsearch and PostgreSQL drivers
+* SECURITY: started updating deprecated code and packages
+* DOCS: documented --credentials, --apikey, --sessionkey. Better detailed contributors guidelines. Added a section on securing the installation
+
+# 1.6.6
+ * FIX: line numbers are aligned with text again (broken in 1.6.4)
+ * FIX: text entered between connection loss and reconnection was not saved
+ * FIX: diagnostic call failed when etherpad was exposed in a subdirectory
+
+# 1.6.5
+ * SECURITY: Escape data when listing available plugins
+ * FIX: Fix typo in apicalls.js which prevented importing isValidJSONPName
+ * FIX: fixed plugin dependency issue
+ * FIX: Update iframe_editor.css
+ * FIX: unbreak Safari iOS line wrapping
+
+# 1.6.4
+ * SECURITY: Access Control bypass on /admin - CVE-2018-9845
+ * SECURITY: Remote Code Execution through pad export - CVE-2018-9327
+ * SECURITY: Remote Code Execution through JSONP handling - CVE-2018-9326
+ * SECURITY: Pad data leak - CVE-2018-9325
+ * Fix: Admin redirect URL
+ * Fix: Various script Fixes
+ * Fix: Various CSS/Style/Layout fixes
+ * NEW: Improved Pad contents readability
+ * NEW: Hook: onAccessCheck
+ * NEW: SESSIONKEY and APIKey customizable path
+ * NEW: checkPads script
+ * NEW: Support "cluster mode"
+
+# 1.6.3
+ * SECURITY: Update ejs
+ * SECURITY: xss vulnerability when reading window.location.href
+ * SECURITY: sanitize jsonp
+ * NEW: Catch SIGTERM for graceful shutdown
+ * NEW: Show actual applied text formatting for caret position
+ * NEW: Add settings to improve scrolling of viewport on line changes
+
 # 1.6.2
  * NEW: Added pad shortcut disabling feature
  * NEW: Create option to automatically reconnect after a few seconds
@@ -48,7 +92,7 @@
  * NEW: Allow LibreOffice to be used when exporting a pad
  * NEW: Create hook exportHtmlAdditionalTagsWithData
  * NEW: Improve DB migration performance
- * NEW: allow settings to be applied from the filesystem 
+ * NEW: allow settings to be applied from the filesystem
  * NEW: remove applySettings hook and allow credentials.json to be part of core
  * NEW: Use exec to switch to node process
  * NEW: Validate incoming color codes
@@ -77,7 +121,7 @@
  * Fix: switchToPad method
  * Fix: Dead keys
  * Fix: Preserve new lines in copy-pasted text
- * Fix: Compatibility mode on IE 
+ * Fix: Compatibility mode on IE
  * Fix: Content Collector to get the class of the DOM-node
  * Fix: Timeslider export links
  * Fix: Double prompt on file upload
@@ -204,7 +248,7 @@
  * Fix: Session Deletion error
  * Fix: Allow browser tabs to be cycled when focus is in editor
  * Fix: Various Editor issues with Easysync potentially entering forever loop on bad changeset
- 
+
 # 1.4
  * NEW: Disable toolbar items through settings.json
  * NEW: Internal stats/metrics engine
@@ -236,7 +280,7 @@
 # 1.3
  * NEW: We now follow the semantic versioning scheme!
  * NEW: Option to disable IP logging
- * NEW: Localisation updates from http://translatewiki.net. 
+ * NEW: Localisation updates from http://translatewiki.net.
  * Fix: Fix readOnly group pads
  * Fix: don't fetch padList on every request
 
@@ -329,7 +373,7 @@
  * NEW: Add authorId to chat and userlist as a data attribute
  * NEW: Refactor and fix our frontend tests
  * NEW: Localisation updates
- 
+
 
 # 1.2.81
  * Fix: CtrlZ-Y for Undo Redo
@@ -369,7 +413,7 @@
  * Other: Change loading message asking user to please wait on first build
  * Other: Allow etherpad to use global npm installation (Safe since node 6.3)
  * Other: Better documentation for log rotation and log message handling
- 
+
 
 
 # 1.2.7
@@ -456,7 +500,7 @@
  * Plugin-specific settings in settings.json (finally allowing for things like a google analytics plugin)
  * Serve admin dashboard at /admin (still very limited, though)
  * Modify your settings.json through the newly created UI at /admin/settings
- * Fix: Import <ol>'s  as <ol>'s and not as <ul>'s!
+ * Fix: Import `<ol>` as `<ol>` and not as `<ul>`!
  * Added solaris compatibility (bin/installDeps.sh was broken on solaris)
  * Fix a bug with IE9 and Password Protected Pads using HTTPS
 
