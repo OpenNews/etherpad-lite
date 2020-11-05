@@ -1,3 +1,90 @@
+# Develop -- TODO Change to 1.8.x.
+* ...
+
+# 1.8.6
+* IMPORTANT: This fixes a severe problem with postgresql in 1.8.5
+* SECURITY: Fix authentication and authorization bypass vulnerabilities
+* API: Update version to 1.2.15
+* FEATURE: Add copyPadWithoutHistory API (#4295)
+* FEATURE: Package more asset files to save http requests (#4286)
+* MINOR: Improve UI when reconnecting
+* TESTS: Improve tests
+
+# 1.8.5
+* IMPORTANT DROP OF SUPPORT: Drop support for IE.  Browsers now need async/await.
+* IMPORTANT SECURITY: Rate limit Commits when env=production
+* SECURITY: Non completed uploads no longer crash Etherpad
+* SECURITY: Log authentication requests
+* FEATURE: Support ES6 (migrate from Uglify-JS to Terser)
+* FEATURE: Improve support for non-cookie enabled browsers
+* FEATURE: New hooks for ``index.html``
+* FEATURE: New script to delete sessions.
+* FEATURE: New setting to allow import withing an author session on a pad
+* FEATURE: Checks Etherpad version on startup and notifies if update is available.  Also available in ``/admin`` interface.
+* FEATURE: Timeslider updates pad location to most recent edit
+* MINOR: Outdent UL/LI items on removal of list item
+* MINOR: Various UL/LI import/export bugs
+* MINOR: PDF export fix
+* MINOR: Front end tests no longer run (and subsequently error) on pull requests
+* MINOR: Fix issue with </li> closing a list before it opens
+* MINOR: Fix bug where large pads would fire a console error in timeslider
+* MINOR: Fix ?showChat URL param issue
+* MINOR: Issue where timeslider URI fails to be correct if padID is numeric
+* MINOR: Include prompt for clear authorship when entire document is selected
+* MINOR: Include full document aText every 100 revisions to make pad restoration on database curruption achievable
+* MINOR: Several Colibris CSS fixes
+* MINOR: Use mime library for mime types instead of hard-coded.
+* MINOR: Don't show "new pad button" if instance is read only
+* MINOR: Use latest NodeJS when doing Windows build
+* MINOR: Change disconnect logic to reconnect instead of silently failing
+* MINOR: Update SocketIO, async, jQuery and Mocha which were stuck due to stale code.
+* MINOR: Rewrite the majority of the ``bin`` scripts to use more modern syntax
+* MINOR: Improved CSS anomation through prefers-reduced-motion
+* PERFORMANCE: Use workers (where possible) to minify CSS/JS on first page request.  This improves initial startup times.
+* PERFORMANCE: Cache EJS files improving page load speed when maxAge > 0.
+* PERFORMANCE: Fix performance for large pads
+* TESTS: Additional test coverage for OL/LI/Import/Export
+* TESTS: Include Simulated Load Testing in CI.
+* TESTS: Include content collector tests to test contentcollector.js logic external to pad dependents.
+* TESTS: Include fuzzing import test.
+* TESTS: Ensure CI is no longer using any cache
+* TESTS: Fix various tests...
+* TESTS: Various additional Travis testing including libreoffice import/export
+
+# 1.8.4
+* FIX: fix a performance regression on MySQL introduced in 1.8.3
+* FIX: when running behind a reverse proxy and exposed in an inner directory, fonts and toolbar icons should now be visible. This is a regression introduced in 1.8.3
+* FIX: cleanups in the UI after the CSS rehaul of 1.8.3
+* MINOR: protect against bugged/stale UI elements after updates. An explicit cache busting via random query string is performed at each start. This needs to be replaced with hashed names in static assets.
+* MINOR: improved some tests
+* MINOR: fixed long-standing bugs in the maintenance tools in /bin (migrateDirtyDBtoRealDB, rebuildPad, convert, importSqlFile)
+
+# 1.8.3
+* FEATURE: colibris is now the default skin for new installs
+* FEATURE: improved colibris visuals, and migrated to Flexbox layout
+* FEATURE: skin variants: colibris skin colors can be easily customized. Visit http://127.0.0.1:9001/p/test#skinvariantsbuilder
+* REQUIREMENTS: minimum required Node version is **10.13.0 LTS**.
+* MINOR: stability fixes for the async migration in 1.8.0 (fixed many UnhandledPromiseRejectionWarning and the few remaining crashes)
+* MINOR: improved stability of import/export functionality
+* MINOR: fixed many small UI quirks (timeslider, import/export, chat)
+* MINOR: Docker images are now built & run in production mode by default
+* MINOR: reduced the size of the Docker images
+* MINOR: better documented cookies and configuration parameters of the Docker image
+* MINOR: better database support (especially MySQL)
+* MINOR: additional test coverage
+* MINOR: restored compatibility with ep_hash_auth
+* MINOR: migrate from swagger-node-express to openapi-backend
+* MINOR: honor the Accept-Language HTTP headers sent by browsers, eventually serving language variants
+* PERFORMANCE: correctly send HTTP/304 for minified files
+* SECURITY: bumped many dependencies. At the time of the release, this version has 0 reported vulnerabilities by npm audit
+* SECURITY: never send referrer when opening a link
+* SECURITY: rate limit imports and exports
+* SECURITY: do not allow pad import if a user never contributed to that pad
+* SECURITY: expose configuration parameter for limiting max import size
+
+*BREAKING CHANGE*: undoing the "clear authorship colors" command is no longer supported (see https://github.com/ether/etherpad-lite/issues/2802)
+*BREAKING CHANGE*: the visuals and CSS structure of the page was updated. Plugins may need a CSS rehaul
+
 # 1.8
 * SECURITY: change referrer policy so that Etherpad addresses aren't leaked when links are clicked (discussion: https://github.com/ether/etherpad-lite/pull/3636)
 * SECURITY: set the "secure" flag for the session cookies when served over SSL. From now on it will not be possible to serve the same instance both in cleartext and over SSL

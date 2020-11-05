@@ -25,16 +25,23 @@ var async = require('async');
 var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
 var CleanCSS = require('clean-css');
-var uglifyJS = require("uglify-js");
 var path = require('path');
-var plugins = require("ep_etherpad-lite/static/js/pluginfw/plugins");
+var plugins = require("ep_etherpad-lite/static/js/pluginfw/plugin_defs");
 var RequireKernel = require('etherpad-require-kernel');
 var urlutil = require('url');
+var mime = require('mime-types')
+var Threads = require('threads')
+var log4js = require('log4js');
+
+var logger = log4js.getLogger("Minify");
 
 var ROOT_DIR = path.normalize(__dirname + "/../../static/");
 var TAR_PATH = path.join(__dirname, 'tar.json');
 var tar = JSON.parse(fs.readFileSync(TAR_PATH, 'utf8'));
 
+var threadsPool = Threads.Pool(function () {
+  return Threads.spawn(new Threads.Worker("./MinifyWorker"))
+}, 2)
 
 var LIBRARY_WHITELIST = [
       'async'
@@ -177,30 +184,12 @@ function minify(req, res)
     }
   }
 
-  // What content type should this be?
-  // TODO: This should use a MIME module.
-  var contentType;
-  if (filename.match(/\.js$/)) {
-    contentType = "text/javascript";
-  } else if (filename.match(/\.css$/)) {
-    contentType = "text/css";
-  } else if (filename.match(/\.html$/)) {
-    contentType = "text/html";
-  } else if (filename.match(/\.txt$/)) {
-    contentType = "text/plain";
-  } else if (filename.match(/\.png$/)) {
-    contentType = "image/png";
-  } else if (filename.match(/\.gif$/)) {
-    contentType = "image/gif";
-  } else if (filename.match(/\.ico$/)) {
-    contentType = "image/x-icon";
-  } else {
-    contentType = "application/octet-stream";
-  }
+  var contentType = mime.lookup(filename);
 
   statFile(filename, function (error, date, exists) {
     if (date) {
       date = new Date(date);
+      date.setMilliseconds(0);
       res.setHeader('last-modified', date.toUTCString());
       res.setHeader('date', (new Date()).toUTCString());
       if (settings.maxAge !== undefined) {
@@ -275,7 +264,7 @@ function getAceFile(callback) {
           data += 'Ace2Editor.EMBEDED[' + JSON.stringify(filename) + '] = '
               +  JSON.stringify(status == 200 ? body || '' : null) + ';\n';
         } else {
-          // Silence?
+          console.error(`getAceFile(): error getting ${resourceURI}. Status code: ${status}`);
         }
         callback();
       });
@@ -379,14 +368,36 @@ function getFileCompressed(filename, contentType, callback) {
     if (error || !content || !settings.minify) {
       callback(error, content);
     } else if (contentType == 'text/javascript') {
-      try {
-        content = compressJS(content);
-      } catch (error) {
-        // silence
-      }
-      callback(null, content);
+      threadsPool.queue(async ({ compressJS }) => {
+        try {
+          logger.info('Compress JS file %s.', filename)
+
+          content = content.toString();
+          const compressResult = await compressJS(content);
+
+          if (compressResult.error) {
+            console.error(`Error compressing JS (${filename}) using terser`, compressResult.error);
+          } else {
+            content = compressResult.code.toString(); // Convert content obj code to string
+          }
+        } catch (error) {
+          console.error(`getFile() returned an error in getFileCompressed(${filename}, ${contentType}): ${error}`);
+        }
+
+        callback(null, content);
+      })
     } else if (contentType == 'text/css') {
-      compressCSS(filename, content, callback);
+      threadsPool.queue(async ({ compressCSS }) => {
+        try {
+          logger.info('Compress CSS file %s.', filename)
+
+          content = await compressCSS(filename, ROOT_DIR);
+        } catch (error) {
+          console.error(`CleanCSS.minify() returned an error on ${filename}: ${error}`);
+        }
+
+        callback(null, content);
+      })
     } else {
       callback(null, content);
     }
@@ -400,32 +411,6 @@ function getFile(filename, callback) {
     callback(undefined, requireDefinition());
   } else {
     fs.readFile(ROOT_DIR + filename, callback);
-  }
-}
-
-function compressJS(content)
-{
-  var decoder = new StringDecoder('utf8');
-  var code = decoder.write(content); // convert from buffer to string
-  var codeMinified = uglifyJS.minify(code, {fromString: true}).code;
-  return codeMinified;
-}
-
-function compressCSS(filename, content, callback)
-{
-  try {
-    var base = path.join(ROOT_DIR, path.dirname(filename));
-    new CleanCSS({relativeTo: base}).minify(content, function (errors, minified) {
-      if (errors) {
-        // On error, just yield the un-minified original.
-        callback(null, content);
-      } else {
-        callback(null, minified.styles);
-      }
-    });
-  } catch (error) {
-    // On error, just yield the un-minified original.
-    callback(null, content);
   }
 }
 

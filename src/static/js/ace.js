@@ -21,7 +21,6 @@
  */
 
 // requires: top
-// requires: plugins
 // requires: undefined
 
 var KERNEL_SOURCE = '../static/js/require-kernel.js';
@@ -31,6 +30,7 @@ Ace2Editor.registry = {
 };
 
 var hooks = require('./pluginfw/hooks');
+var pluginUtils = require('./pluginfw/shared');
 var _ = require('./underscore');
 
 function scriptTag(source) {
@@ -102,7 +102,15 @@ function Ace2Editor()
     var prefix = 'ace_';
     var name = prefix + fnName;
     editor[fnName] = pendingInit(function(){
-      info[prefix + fnName].apply(this, arguments);
+      if(fnName === "setAuthorInfo"){
+        if(!arguments[0]){
+          // setAuthorInfo AuthorId not set for some reason
+        }else{
+          info[prefix + fnName].apply(this, arguments);
+        }
+      }else{
+        info[prefix + fnName].apply(this, arguments);
+      }
     });
   });
 
@@ -217,7 +225,7 @@ function Ace2Editor()
       var iframeHTML = [];
 
       iframeHTML.push(doctype);
-      iframeHTML.push("<html><head>");
+      iframeHTML.push("<html class='inner-editor " + clientVars.skinVariants + "'><head>");
 
       // calls to these functions ($$INCLUDE_...)  are replaced when this file is processed
       // and compressed, putting the compressed code from the named file directly into the
@@ -229,7 +237,7 @@ function Ace2Editor()
 
       // disableCustomScriptsAndStyles can be used to disable loading of custom scripts
       if(!clientVars.disableCustomScriptsAndStyles){
-        $$INCLUDE_CSS("../static/css/pad.css");
+        $$INCLUDE_CSS("../static/css/pad.css?v=" + clientVars.randomVersionString);
       }
 
       var additionalCSS = _(hooks.callAll("aceEditorCSS")).map(function(path){
@@ -239,7 +247,7 @@ function Ace2Editor()
         return '../static/plugins/' + path;
       });
       includedCSS = includedCSS.concat(additionalCSS);
-      $$INCLUDE_CSS("../static/skins/" + clientVars.skinName + "/pad.css");
+      $$INCLUDE_CSS("../static/skins/" + clientVars.skinName + "/pad.css?v=" + clientVars.randomVersionString);
 
       pushStyleTagsFor(iframeHTML, includedCSS);
 
@@ -255,9 +263,7 @@ require.setRootURI("../javascripts/src");\n\
 require.setLibraryURI("../javascripts/lib");\n\
 require.setGlobalKeyPath("require");\n\
 \n\
-var hooks = require("ep_etherpad-lite/static/js/pluginfw/hooks");\n\
 var plugins = require("ep_etherpad-lite/static/js/pluginfw/client_plugins");\n\
-hooks.plugins = plugins;\n\
 plugins.adoptPluginsFromAncestorsOf(window);\n\
 \n\
 $ = jQuery = require("ep_etherpad-lite/static/js/rjquery").jQuery; // Expose jQuery #HACK\n\
@@ -308,12 +314,12 @@ window.onload = function () {\n\
   }, 0);\n\
 }';
 
-      var outerHTML = [doctype, '<html><head>']
+      var outerHTML = [doctype, '<html class="inner-editor outerdoc ' + clientVars.skinVariants + '"><head>']
 
       var includedCSS = [];
       var $$INCLUDE_CSS = function(filename) {includedCSS.push(filename)};
       $$INCLUDE_CSS("../static/css/iframe_editor.css");
-      $$INCLUDE_CSS("../static/css/pad.css");
+      $$INCLUDE_CSS("../static/css/pad.css?v=" + clientVars.randomVersionString);
 
 
       var additionalCSS = _(hooks.callAll("aceEditorCSS")).map(function(path){
@@ -323,13 +329,22 @@ window.onload = function () {\n\
         return '../static/plugins/' + path }
       );
       includedCSS = includedCSS.concat(additionalCSS);
-      $$INCLUDE_CSS("../static/skins/" + clientVars.skinName + "/pad.css");
+      $$INCLUDE_CSS("../static/skins/" + clientVars.skinName + "/pad.css?v=" + clientVars.randomVersionString);
 
       pushStyleTagsFor(outerHTML, includedCSS);
 
       // bizarrely, in FF2, a file with no "external" dependencies won't finish loading properly
       // (throbs busy while typing)
-      outerHTML.push('<style type="text/css" title="dynamicsyntax"></style>', '<link rel="stylesheet" type="text/css" href="data:text/css,"/>', scriptTag(outerScript), '</head><body id="outerdocbody" class="outerdocbody ', hooks.clientPluginNames().join(' '),'"><div id="sidediv" class="sidediv"><!-- --></div><div id="linemetricsdiv">x</div></body></html>');
+      var pluginNames = pluginUtils.clientPluginNames();
+      outerHTML.push(
+          '<style type="text/css" title="dynamicsyntax"></style>',
+          '<link rel="stylesheet" type="text/css" href="data:text/css,"/>',
+          scriptTag(outerScript),
+          '</head>',
+          '<body id="outerdocbody" class="outerdocbody ', pluginNames.join(' '), '">',
+          '<div id="sidediv" class="sidediv"><!-- --></div>',
+          '<div id="linemetricsdiv">x</div>',
+          '</body></html>');
 
       var outerFrame = document.createElement("IFRAME");
       outerFrame.name = "ace_outer";

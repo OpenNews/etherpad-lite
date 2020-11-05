@@ -38,6 +38,20 @@ var libreOfficeLogger = log4js.getLogger('LibreOffice');
  * @param  {Function}   callback    Standard callback function
  */
 exports.convertFile = function(srcFile, destFile, type, callback) {
+  // Used for the moving of the file, not the conversion
+  var fileExtension = type;
+
+  if (type === "html") {
+    // "html:XHTML Writer File:UTF8" does a better job than normal html exports
+    if (path.extname(srcFile).toLowerCase() === ".doc") {
+      type = "html";
+    }
+    // PDF files need to be converted with LO Draw ref https://github.com/ether/etherpad-lite/issues/4151
+    if (path.extname(srcFile).toLowerCase() === ".pdf") {
+      type = "html:XHTML Draw File"
+    }
+  }
+
   // soffice can't convert from html to doc directly (verified with LO 5 and 6)
   // we need to convert to odt first, then to doc
   // to avoid `Error: no export filter for /tmp/xxxx.doc` error
@@ -47,11 +61,11 @@ exports.convertFile = function(srcFile, destFile, type, callback) {
       "destFile": destFile.replace(/\.doc$/, '.odt'),
       "type": 'odt',
       "callback": function () {
-        queue.push({"srcFile": srcFile.replace(/\.html$/, '.odt'), "destFile": destFile, "type": type, "callback": callback});
+        queue.push({"srcFile": srcFile.replace(/\.html$/, '.odt'), "destFile": destFile, "type": type, "callback": callback, "fileExtension": fileExtension });
       }
     });
   } else {
-    queue.push({"srcFile": srcFile, "destFile": destFile, "type": type, "callback": callback});
+    queue.push({"srcFile": srcFile, "destFile": destFile, "type": type, "callback": callback, "fileExtension": fileExtension});
   }
 };
 
@@ -102,7 +116,7 @@ function doConvertTask(task, callback) {
     // Move the converted file to the correct place
     function(callback) {
       var filename = path.basename(task.srcFile);
-      var sourceFilename = filename.substr(0, filename.lastIndexOf('.')) + '.' + task.type;
+      var sourceFilename = filename.substr(0, filename.lastIndexOf('.')) + '.' + task.fileExtension;
       var sourcePath = path.join(tmpDir, sourceFilename);
       libreOfficeLogger.debug(`Renaming ${sourcePath} to ${task.destFile}`);
       fs.rename(sourcePath, task.destFile, callback);

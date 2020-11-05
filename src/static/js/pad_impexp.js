@@ -111,6 +111,10 @@ var padimpexp = (function()
       msg = html10n.get("pad.impexp.uploadFailed");
     } else if(status === "padHasData"){
       msg = html10n.get("pad.impexp.padHasData");
+    } else if(status === "maxFileSize"){
+      msg = html10n.get("pad.impexp.maxFileSize");
+    } else if(status === "permission"){
+      msg = html10n.get("pad.impexp.permission");
     }
 
     function showError(fade)
@@ -240,11 +244,22 @@ var padimpexp = (function()
     },
     handleFrameCall: function(directDatabaseAccess, status)
     {
+      if(directDatabaseAccess === "undefined") directDatabaseAccess = false;
       if (status !== "ok")
       {
         importFailed(status);
       }
-      if(directDatabaseAccess) pad.switchToPad(clientVars.padId);
+      else
+      {
+        $('#import_export').removeClass('popup-show');
+      }
+
+      if (directDatabaseAccess) {
+        // Switch to the pad without redrawing the page
+        pad.switchToPad(clientVars.padId);
+        $('#import_export').removeClass('popup-show');
+      }
+
       importDone();
     },
     disable: function()

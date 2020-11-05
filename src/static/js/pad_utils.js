@@ -56,13 +56,15 @@ function createCookie(name, value, days, path){ /* Used by IE */
 
   //Check if we accessed the pad over https
   var secure = window.location.protocol == "https:" ? ";secure" : "";
+  var isHttpsScheme = window.location.protocol === "https:";
+  var sameSite = isHttpsScheme ?  ";sameSite=Strict": ";sameSite=Lax";
 
   //Check if the browser is IE and if so make sure the full path is set in the cookie
   if((navigator.appName == 'Microsoft Internet Explorer') || ((navigator.appName == 'Netscape') && (new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})").exec(navigator.userAgent) != null))){
-    document.cookie = name + "=" + value + expires + "; path=/" + secure; /* Note this bodge fix for IE is temporary until auth is rewritten */
+    document.cookie = name + "=" + value + expires + "; path=/" + secure + sameSite; /* Note this bodge fix for IE is temporary until auth is rewritten */
   }
   else{
-    document.cookie = name + "=" + value + expires + "; path=" + path + secure;
+    document.cookie = name + "=" + value + expires + "; path=" + path + secure + sameSite;
   }
 
 }
@@ -526,12 +528,30 @@ function setupGlobalExceptionHandler() {
     {
       var errorId = randomString(20);
       var userAgent = padutils.escapeHtml(navigator.userAgent);
-      if ($("#editorloadingbox").attr("display") != "none"){
-        //show javascript errors to the user
-        $("#editorloadingbox").css("padding", "10px");
-        $("#editorloadingbox").css("padding-top", "45px");
-        $("#editorloadingbox").html("<div style='text-align:left;color:red;font-size:16px;'><b>An error occurred</b><br>The error was reported with the following id: '" + errorId + "'<br><br><span style='color:black;font-weight:bold;font-size:16px'>Please press and hold Ctrl and press F5 to reload this page, if the problem persists please send this error message to your webmaster: </span><div style='color:black;font-size:14px'>'"
-          + "ErrorId: " + errorId + "<br>URL: " + padutils.escapeHtml(window.location.href) + "<br>UserAgent: " + userAgent + "<br>" + msg + " in " + url + " at line " + linenumber + "'</div></div>");
+
+      var msgAlreadyVisible = false;
+      $('.gritter-item .error-msg').each(function() {
+        if ($(this).text() === msg) {
+            msgAlreadyVisible = true;
+        }
+      });
+
+      if (!msgAlreadyVisible) {
+        errorMsg = "<b>Please press and hold Ctrl and press F5 to reload this page</b></br> \
+                    If the problem persists please send this error message to your webmaster: </br></br>\
+                    <div style='text-align:left; font-size: .8em'>\
+                    ErrorId: " + errorId + "<br>\
+                    URL: " + padutils.escapeHtml(window.location.href) + "<br>\
+                    UserAgent: " + userAgent + "<br>\
+                    <span class='error-msg'>"+ msg + "</span> in " + url + " at line " + linenumber + '</div>';
+
+        $.gritter.add({
+          title: "An error occurred",
+          text: errorMsg,
+          class_name: "error",
+          position: 'bottom',
+          sticky: true,
+        });
       }
 
       //send javascript errors to the server

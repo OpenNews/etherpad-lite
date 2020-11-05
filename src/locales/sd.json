@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"BaRaN6161 TURK",
 			"Mehtab ahmed",
 			"Tweety"
 		]
@@ -31,7 +32,6 @@
 	"pad.settings.linenocheck": "سٽ جا انگ",
 	"pad.settings.rtlcheck": "مواد ساڄي کان کاٻي طرف پڙهندئو؟",
 	"pad.settings.fontType": "اکرن جو قسم:",
-	"pad.settings.globalView": "عالمي نظارو",
 	"pad.settings.language": "ٻولي:",
 	"pad.importExport.import_export": "برآمد/درآمد",
 	"pad.importExport.import": "ڪو به متن وارو فائيل يا دستاويز چاڙهيو",
@@ -67,7 +67,7 @@
 	"timeslider.toolbar.exportlink.title": "برآمد ڪريو",
 	"timeslider.version": "ورزن {{version}}",
 	"timeslider.saved": "سانڍيل {{month}} {{day}}، {{year}}",
-	"timeslider.dateformat": "{{مهينو}}/{{ڏينهن}}/{{سال}} {{ڪلاڪ}}:{{منٽ}}:{{سيڪنڊ}}",
+	"timeslider.dateformat": "{{month}}/{{day}}/{{year}} {{hours}}:{{minutes}}:{{seconds}}",
 	"timeslider.month.january": "جنوري",
 	"timeslider.month.february": "فيبروري",
 	"timeslider.month.march": "مارچ",

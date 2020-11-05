@@ -598,6 +598,21 @@ exports.copyPad = async function(sourceID, destinationID, force)
 }
 
 /**
+copyPadWithoutHistory(sourceID, destinationID[, force=false]) copies a pad. If force is true,
+  the destination will be overwritten if it exists.
+
+Example returns:
+
+{code: 0, message:"ok", data: {padID: destinationID}}
+{code: 1, message:"padID does not exist", data: null}
+*/
+exports.copyPadWithoutHistory = async function(sourceID, destinationID, force)
+{
+  let pad = await getPadSafe(sourceID, true);
+  await pad.copyPadWithoutHistory(destinationID, force);
+}
+
+/**
 movePad(sourceID, destinationID[, force=false]) moves a pad. If force is true,
   the destination will be overwritten if it exists.
 
@@ -835,6 +850,34 @@ exports.createDiffHTML = async function(padID, startRev, endRev) {
   let authors = await padDiff.getAuthors();
 
   return { html, authors };
+}
+
+/**********************/
+/** GLOBAL FUNCTIONS **/
+/**********************/
+
+/**
+ getStats() returns an json object with some instance stats
+
+ Example returns:
+
+ {"code":0,"message":"ok","data":{"totalPads":3,"totalSessions": 2,"totalActivePads": 1}}
+ {"code":4,"message":"no or wrong API Key","data":null}
+ */
+
+exports.getStats = async function() {
+  const sessionInfos = padMessageHandler.sessioninfos;
+
+  const sessionKeys = Object.keys(sessionInfos);
+  const activePads = new Set(Object.entries(sessionInfos).map(k => k[1].padId));
+
+  const { padIDs } = await padManager.listAllPads();
+
+  return {
+    totalPads: padIDs.length,
+    totalSessions: sessionKeys.length,
+    totalActivePads: activePads.size,
+  }
 }
 
 /******************************/

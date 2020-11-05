@@ -23,7 +23,6 @@
 // These jQuery things should create local references, but for now `require()`
 // assigns to the global `$` and augments it with plugins.
 require('./jquery');
-JSON = require('./json2');
 
 var createCookie = require('./pad_utils').createCookie;
 var readCookie = require('./pad_utils').readCookie;
@@ -78,8 +77,6 @@ function init() {
     //route the incoming messages
     socket.on('message', function(message)
     {
-      if(window.console) console.log(message);
-
       if(message.type == "CLIENT_VARS")
       {
         handleClientVars(message);
@@ -88,7 +85,7 @@ function init() {
       {
         $("body").html("<h2>You have no permission to access this pad</h2>")
       } else {
-        changesetLoader.handleMessageFromServer(message);
+        if(message.type === 'CHANGESET_REQ') changesetLoader.handleMessageFromServer(message);
       }
     });
 
@@ -141,13 +138,24 @@ function handleClientVars(message)
   //initialize export ui
   require('./pad_impexp').padimpexp.init();
 
+  // Create a base URI used for timeslider exports
+  var baseURI = document.location.pathname;
+
   //change export urls when the slider moves
   BroadcastSlider.onSlider(function(revno)
   {
     // export_links is a jQuery Array, so .each is allowed.
     export_links.each(function()
     {
-      this.setAttribute('href', this.href.replace( /(.+?)\/[^\/]+\/(\d+\/)?export/ , '$1/' + padId + '/' + revno + '/export'));
+      // Modified from regular expression to fix:
+      // https://github.com/ether/etherpad-lite/issues/4071
+      // Where a padId that was numeric would create the wrong export link
+      if(this.href){
+        var type = this.href.split('export/')[1];
+        var href = baseURI.split('timeslider')[0];
+        href += revno + '/export/' + type;
+        this.setAttribute('href', href);
+      }
     });
   });
 
@@ -165,32 +173,8 @@ function handleClientVars(message)
 
   // font family change
   $("#viewfontmenu").change(function(){
-    var font = $("#viewfontmenu").val();
-    switch (font) {
-      case "monospace": setFont("Courier new");break;
-      case "opendyslexic": setFont("OpenDyslexic");break;
-      case "comicsans": setFont("Comic Sans MS");break;
-      case "georgia": setFont("Georgia");break;
-      case "impact": setFont("Impact");break;
-      case "lucida": setFont("Lucida");break;
-      case "lucidasans": setFont("Lucida Sans Unicode");break;
-      case "palatino": setFont("Palatino Linotype");break;
-      case "tahoma": setFont("Tahoma");break;
-      case "timesnewroman": setFont("Times New Roman");break;
-      case "trebuchet": setFont("Trebuchet MS");break;
-      case "verdana": setFont("Verdana");break;
-      case "symbol": setFont("Symbol");break;
-      case "webdings": setFont("Webdings");break;
-      case "wingdings": setFont("Wingdings");break;
-      case "sansserif": setFont("MS Sans Serif");break;
-      case "serif": setFont("MS Serif");break;
-      default: setFont("");break;
-    }
+    $('#innerdocbody').css("font-family", $(this).val() || "");
   });
-}
-
-function setFont(font){
-  $('#padcontent').css("font-family", font);
 }
 
 exports.baseURL = '';

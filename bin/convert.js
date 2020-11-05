@@ -1,7 +1,7 @@
 var startTime = Date.now();
 var fs = require("fs");
-var ueberDB = require("../src/node_modules/ueberDB");
-var mysql = require("../src/node_modules/ueberDB/node_modules/mysql");
+var ueberDB = require("../src/node_modules/ueberdb2");
+var mysql = require("../src/node_modules/ueberdb2/node_modules/mysql");
 var async = require("../src/node_modules/async");
 var Changeset = require("ep_etherpad-lite/static/js/Changeset");
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
@@ -349,7 +349,7 @@ function convertPad(padId, callback)
 
           //generate new author values
           var authorID = "a." + randomString(16);
-          var authorColorID = authors[i].colorId || Math.floor(Math.random()*32);
+          var authorColorID = authors[i].colorId || Math.floor(Math.random()*(exports.getColorPalette().length));
           var authorName = authors[i].name || null;
 
           //overwrite the authorID of the attribute pool
