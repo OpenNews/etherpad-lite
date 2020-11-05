@@ -31,7 +31,8 @@
  */
 
 :root {
-  --super-dark-color: #485365; /*#374256;*/
+  /* --super-dark-color: #485365; /*#374256;*/
+  --super-dark-color: #1e222a;
   --dark-color: #576273; /*#4d5d77*/
 
   --primary-color: #64d29b;
@@ -48,7 +49,8 @@
 
   --toolbar-border: none;
 
-  --main-font-family: Quicksand, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  /* --main-font-family: Quicksand, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; */
+  --main-font-family: "Open Sans", "Helvetica Neue", sans-serif;
 
   /* Those padding like an external padding. Basic padding of 15px is always applied */
   --editor-horizontal-padding: 40px;
